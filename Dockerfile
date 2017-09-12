@@ -7,13 +7,18 @@ ENV ANDROID_HOME /opt/android-sdk-linux
 ENV PATH ${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools
 ENV ANDROID_BUILD_TOOLS_VERSION 25.0.2
 
+RUN apk -U add tar && \
+    rm /var/cache/apk/*
+
 RUN npm install -g node-sass cordova ionic && \
     echo y | cordova -v
 
 RUN apk update && apk add openjdk8 python ruby git openssh
 
 ADD https://dl.google.com/android/${ANDROID_SDK_VERSION} /opt
-
+RUN cd /opt && \
+    tar -xf ${ANDROID_SDK_VERSION} && \
+    rm -f ${ANDROID_SDK_VERSION}
 RUN echo y | android update sdk --no-ui -a --filter tools,platform-tools,${ANDROID_API_LEVELS},build-tools-${ANDROID_BUILD_TOOLS_VERSION} --no-https && \
     rm /var/cache/apk/*
 
